@@ -8,6 +8,7 @@ import (
 	"edumatch/backend/internal/middleware"
 	"edumatch/backend/internal/services"
 	"edumatch/backend/internal/ws"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +31,9 @@ func NewRouter(cfg config.Config, h Handlers) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{cfg.FrontendURL, "http://localhost:3000", "http://127.0.0.1:3000"},
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
