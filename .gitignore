@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+backend/.env
+frontend/.env.local
+
+backend/uploads/avatars/*
+!backend/uploads/avatars/.gitkeep
+
+*.log
+*.tmp
+*.tsbuildinfo
