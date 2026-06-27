@@ -31,8 +31,13 @@ export default function ProjectDetailPage() {
 
   const isOwner = project?.owner_id === user?.id;
   const isMember = useMemo(() => project?.members.some((member) => member.user_id === user?.id) ?? false, [project, user]);
+  const isClosed = project?.status === "completed" || project?.status === "archived";
 
   const apply = async () => {
+    if (isClosed) {
+      setError("Проект завершен, заявки закрыты.");
+      return;
+    }
     setError("");
     setNotice("");
     setLoadingApply(true);
@@ -167,20 +172,18 @@ export default function ProjectDetailPage() {
                 <Link
                   href={`/profile/${member.user_id}`}
                   key={member.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3 transition hover:bg-surface"
+                  className="flex items-center gap-3 rounded-lg border border-border p-3 transition hover:bg-surface"
                 >
-                  <div className="flex items-center gap-3">
-                    <Avatar name={member.user.name} src={member.user.avatar_url} />
-                    <div>
-                      <p className="font-semibold">{member.user.name}</p>
-                      <p className="text-xs text-muted">
-                        {member.user.course} курс, {member.user.university}
-                      </p>
+                  <Avatar name={member.user.name} src={member.user.avatar_url} size={44} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate font-semibold">{member.user.name}</p>
+                      <Badge tone={member.role === "creator" ? "brand" : "neutral"}>{memberRoleLabel(member.role)}</Badge>
                     </div>
+                    <p className="mt-1 text-xs text-muted">
+                      {member.user.course} курс, {member.user.university}
+                    </p>
                   </div>
-                  <Badge tone={member.role === "creator" ? "brand" : "neutral"}>
-                    {member.role === "creator" ? "Создатель" : "Участник"}
-                  </Badge>
                 </Link>
               ))}
             </div>
@@ -201,7 +204,7 @@ export default function ProjectDetailPage() {
             </Link>
           </Card>
 
-          {!isOwner && !isMember ? (
+          {!isOwner && !isMember && !isClosed ? (
             <Card className="p-5">
               <h2 className="font-bold">Подать заявку</h2>
               <Textarea
@@ -218,6 +221,12 @@ export default function ProjectDetailPage() {
               </Button>
             </Card>
           ) : null}
+          {!isOwner && !isMember && isClosed ? (
+            <Card className="p-5">
+              <h2 className="font-bold">Заявки закрыты</h2>
+              <p className="mt-2 text-sm text-muted">Проект завершен, поэтому отправить заявку уже нельзя.</p>
+            </Card>
+          ) : null}
         </aside>
       </div>
     </div>
@@ -231,6 +240,10 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="mt-2 text-sm font-bold">{value}</p>
     </div>
   );
+}
+
+function memberRoleLabel(role: Project["members"][number]["role"]) {
+  return role === "creator" ? "Создатель" : "Участник";
 }
 
 function escapeHtml(value: string) {

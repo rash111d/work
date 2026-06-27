@@ -179,6 +179,32 @@ func (s *Store) ForUser(userID uint) ([]entities.Project, error) {
 	return projects, err
 }
 
+func (s *Store) CreatedProjects(userID uint) ([]entities.Project, error) {
+	var projects []entities.Project
+	err := s.db.
+		Where("projects.owner_id = ?", userID).
+		Preload("Owner").
+		Preload("Stack").
+		Preload("Members.User").
+		Order("projects.updated_at DESC").
+		Find(&projects).Error
+	return projects, err
+}
+
+func (s *Store) JoinedProjects(userID uint) ([]entities.Project, error) {
+	var projects []entities.Project
+	err := s.db.
+		Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", userID).
+		Where("projects.owner_id <> ?", userID).
+		Preload("Owner").
+		Preload("Stack").
+		Preload("Members.User").
+		Order("projects.updated_at DESC").
+		Find(&projects).Error
+	return projects, err
+}
+
 func (s *Store) Recommendations(userID uint, skillNames []string, limitValue int) ([]entities.Project, error) {
 	var projects []entities.Project
 	names := lowerNames(skillNames)

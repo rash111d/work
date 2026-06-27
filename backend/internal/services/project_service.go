@@ -105,6 +105,9 @@ func (s *ProjectService) Apply(userID, projectID uint, input ApplyInput) (*entit
 	if project.OwnerID == userID {
 		return nil, domain.ErrConflict
 	}
+	if project.Status == entities.ProjectStatusCompleted || project.Status == entities.ProjectStatusArchived {
+		return nil, domain.ErrConflict
+	}
 	isMember, err := s.store.IsMember(projectID, userID)
 	if err != nil {
 		return nil, err

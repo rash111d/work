@@ -47,6 +47,8 @@ type ProjectRepository interface {
 	FindByID(projectID uint) (*entities.Project, error)
 	List(filters ProjectFilters) ([]entities.Project, int64, error)
 	ForUser(userID uint) ([]entities.Project, error)
+	CreatedProjects(userID uint) ([]entities.Project, error)
+	JoinedProjects(userID uint) ([]entities.Project, error)
 	Recommendations(userID uint, skillNames []string, limit int) ([]entities.Project, error)
 	AddMember(projectID, userID uint, role entities.MemberRole) error
 	IsMember(projectID, userID uint) (bool, error)

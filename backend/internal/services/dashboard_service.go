@@ -15,6 +15,7 @@ type DashboardService struct {
 type Dashboard struct {
 	Stats               DashboardStats          `json:"stats"`
 	MyProjects          []entities.Project      `json:"my_projects"`
+	JoinedProjects      []entities.Project      `json:"joined_projects"`
 	MyApplications      []entities.Application  `json:"my_applications"`
 	RecommendedProjects []entities.Project      `json:"recommended_projects"`
 	Notifications       []entities.Notification `json:"notifications"`
@@ -40,7 +41,11 @@ func NewDashboardService(store *repositories.Store, projects *ProjectService) *D
 }
 
 func (s *DashboardService) Get(userID uint) (*Dashboard, error) {
-	myProjects, err := s.store.ForUser(userID)
+	myProjects, err := s.store.CreatedProjects(userID)
+	if err != nil {
+		return nil, err
+	}
+	joinedProjects, err := s.store.JoinedProjects(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +96,7 @@ func (s *DashboardService) Get(userID uint) (*Dashboard, error) {
 			Notifications: unread,
 		},
 		MyProjects:          myProjects,
+		JoinedProjects:      joinedProjects,
 		MyApplications:      apps,
 		RecommendedProjects: recommended,
 		Notifications:       notifications,

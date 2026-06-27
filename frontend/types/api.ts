@@ -93,6 +93,7 @@ export type Dashboard = {
     notifications: number;
   };
   my_projects: Project[];
+  joined_projects: Project[];
   my_applications: Application[];
   recommended_projects: Project[];
   notifications: Notification[];
