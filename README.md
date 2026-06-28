@@ -1,133 +1,432 @@
 # EduMatch
 
-EduMatch is a platform for students that helps them find teammates, collaborate on projects, and communicate with each other.
+## Описание проекта
 
-## Features
+EduMatch — это full-stack веб-приложение, предназначенное для поиска тиммейтов, создания учебных проектов и совместной работы студентов.
 
-* User registration and authentication
-* JWT Access & Refresh Tokens
-* Student profile management
-* Avatar upload
-* Skills management
-* Project creation and management
-* Search and filter projects
-* Apply to projects
-* Incoming and outgoing applications
-* Application approval and rejection
-* Real-time project chat (WebSocket)
-* Dashboard
-* Notifications
-* PostgreSQL database
-* Redis refresh token storage
-* REST API
-* Responsive Next.js frontend
+Пользователь может зарегистрироваться, заполнить профиль, указать свои навыки, создавать собственные проекты, искать существующие проекты, отправлять заявки на участие и общаться с другими участниками команды через встроенный чат в режиме реального времени.
 
 ---
 
-## Tech Stack
+# Используемые технологии
 
-### Backend
-
-* Go
-* Gin
-* GORM
-* PostgreSQL
-* Redis
-* JWT
-* Gorilla WebSocket
-
-### Frontend
+## Frontend
 
 * Next.js
 * React
 * TypeScript
 * Tailwind CSS
-
-### Deployment
-
-* Backend — Render
-* Frontend — Vercel
-* Database — Neon PostgreSQL
-* Cache — Upstash Redis
-
----
-
-## Project Structure
-
-```
-backend/
-├── cmd/
-├── internal/
-│   ├── config/
-│   ├── handlers/
-│   ├── middleware/
-│   ├── repositories/
-│   ├── routes/
-│   ├── services/
-│   └── ws/
-└── uploads/
-
-frontend/
-├── app/
-├── components/
-├── lib/
-├── services/
-├── types/
-└── public/
-```
-
----
-
-## Installation
-
-### Clone repository
-
-```bash
-git clone https://github.com/rash111d/work.git
-cd work
-```
-
----
+* Lucide React
 
 ## Backend
 
+* Go
+* Gin
+* GORM
+
+## База данных
+
+* PostgreSQL (Neon)
+
+## Кэширование и сессии
+
+* Redis
+
+## Авторизация
+
+* JWT
+* Refresh Token
+
+## Дополнительно
+
+* WebSocket
+* REST API
+
+---
+
+# Возможности приложения
+
+## Авторизация
+
+* Регистрация
+* Вход
+* Выход
+* JWT авторизация
+* Refresh Token
+
+---
+
+## Профиль пользователя
+
+* Редактирование профиля
+* Загрузка аватара
+* Изменение информации "О себе"
+* Университет
+* Курс
+* Город
+* Навыки
+
+---
+
+## Проекты
+
+* Создание проекта
+* Редактирование проекта
+* Удаление проекта
+* Просмотр проекта
+* Поиск проектов
+* Фильтрация
+* Сортировка
+
+---
+
+## Поиск студентов
+
+* Поиск по навыкам
+* Поиск по университету
+* Поиск по курсу
+* Просмотр профиля пользователя
+
+---
+
+## Заявки
+
+* Отправка заявки
+* Принятие заявки
+* Отклонение заявки
+* Просмотр статуса заявки
+
+---
+
+## Dashboard
+
+* Мои проекты
+* Проекты, в которых пользователь участвует
+* Мои заявки
+* Рекомендуемые проекты
+* Уведомления
+* Последняя активность
+
+---
+
+## Чат
+
+* WebSocket
+* Общение участников проекта
+* История сообщений
+
+---
+
+# Архитектура проекта
+
+Проект построен по принципам **Clean Architecture**.
+
+```text
+Frontend (Next.js)
+
+↓
+
+REST API
+
+↓
+
+Handlers
+
+↓
+
+Services
+
+↓
+
+Repositories
+
+↓
+
+PostgreSQL
+```
+
+---
+
+# Структура Backend
+
+```text
+backend/
+
+cmd/
+internal/
+
+config/
+domain/
+entities/
+handlers/
+middleware/
+repositories/
+routes/
+services/
+ws/
+
+uploads/
+```
+
+### cmd
+
+Точка входа приложения.
+
+### config
+
+Подключение PostgreSQL, Redis и загрузка переменных окружения.
+
+### domain
+
+Общие структуры и фильтры.
+
+### entities
+
+Модели базы данных.
+
+### handlers
+
+Обработка HTTP-запросов.
+
+### services
+
+Бизнес-логика приложения.
+
+### repositories
+
+Работа с базой данных.
+
+### middleware
+
+JWT авторизация.
+
+### routes
+
+Настройка REST API.
+
+### ws
+
+WebSocket чат.
+
+---
+
+# Структура Frontend
+
+```text
+frontend/
+
+app/
+components/
+hooks/
+services/
+types/
+utils/
+```
+
+### app
+
+Все страницы приложения.
+
+### components
+
+Переиспользуемые UI-компоненты.
+
+### hooks
+
+React Hooks.
+
+### services
+
+Работа с REST API.
+
+### types
+
+Типы TypeScript.
+
+### utils
+
+Вспомогательные функции.
+
+---
+
+# Основные сущности
+
+* User
+* Skill
+* Project
+* ProjectMember
+* Application
+* Message
+* Notification
+* RefreshSession
+
+---
+
+# REST API
+
+## Авторизация
+
+```http
+POST /auth/register
+
+POST /auth/login
+
+POST /auth/refresh
+
+POST /auth/logout
+```
+
+---
+
+## Пользователь
+
+```http
+GET /users/me
+
+PUT /users/me
+
+POST /users/me/avatar
+
+GET /users
+
+GET /users/:id
+```
+
+---
+
+## Проекты
+
+```http
+GET /projects
+
+POST /projects
+
+GET /projects/:id
+
+PUT /projects/:id
+
+DELETE /projects/:id
+
+GET /projects/mine
+
+GET /projects/recommended
+```
+
+---
+
+## Заявки
+
+```http
+POST /projects/:id/applications
+
+GET /applications/mine
+
+GET /applications/incoming
+
+PATCH /applications/:id/status
+```
+
+---
+
+## Dashboard
+
+```http
+GET /dashboard
+```
+
+---
+
+## Уведомления
+
+```http
+GET /notifications
+
+PATCH /notifications/:id/read
+
+PATCH /notifications/read-all
+```
+
+---
+
+## Навыки
+
+```http
+GET /skills
+```
+
+---
+
+## WebSocket
+
+```text
+/ws/projects/:id
+```
+
+Используется для обмена сообщениями между участниками проекта в режиме реального времени.
+
+---
+
+# Локальный запуск проекта
+
+## Backend
+
+Перейдите в папку backend
+
 ```bash
 cd backend
+```
 
+Установите зависимости
+
+```bash
 go mod tidy
-
-go run ./cmd
 ```
 
-The backend starts on:
+Запустите сервер
 
-```
-http://localhost:8080
+```bash
+go run cmd/main.go
 ```
 
 ---
 
 ## Frontend
 
+Перейдите в папку frontend
+
 ```bash
 cd frontend
+```
 
+Установите зависимости
+
+```bash
 npm install
+```
 
+Запустите приложение
+
+```bash
 npm run dev
 ```
 
-Frontend:
+Frontend будет доступен по адресу:
 
-```
+```text
 http://localhost:3000
+```
+
+Backend:
+
+```text
+http://localhost:8080
 ```
 
 ---
 
-## Environment Variables
+# Переменные окружения
 
-### Backend (.env)
+## Backend (.env)
 
 ```env
 APP_ENV=development
@@ -138,104 +437,81 @@ API_BASE_URL=http://localhost:8080
 
 FRONTEND_URL=http://localhost:3000
 
-DATABASE_URL=postgres://postgres:password@localhost:5432/edumatch?sslmode=disable
+DATABASE_URL=postgres://...
 
 REDIS_ADDR=localhost:6379
+
 REDIS_PASSWORD=
+
 REDIS_DB=0
 
 JWT_SECRET=your-secret-key
+
 JWT_ACCESS_TTL_MINUTES=15
+
 JWT_REFRESH_TTL_DAYS=30
 
 UPLOAD_DIR=uploads
 ```
 
-### Frontend (.env.local)
+---
+
+## Frontend (.env.local)
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+
 NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
 ```
 
 ---
 
-## API
+# Деплой
 
-### Authentication
+## Frontend
 
-| Method | Endpoint              |
-| ------ | --------------------- |
-| POST   | /api/v1/auth/register |
-| POST   | /api/v1/auth/login    |
-| POST   | /api/v1/auth/refresh  |
-| POST   | /api/v1/auth/logout   |
+Vercel
 
-### Users
+## Backend
 
-| Method | Endpoint                |
-| ------ | ----------------------- |
-| GET    | /api/v1/users/me        |
-| PUT    | /api/v1/users/me        |
-| POST   | /api/v1/users/me/avatar |
-| GET    | /api/v1/users           |
-| GET    | /api/v1/users/:id       |
-| GET    | /api/v1/skills          |
+Render
 
-### Projects
+## База данных
 
-| Method | Endpoint                     |
-| ------ | ---------------------------- |
-| GET    | /api/v1/projects             |
-| POST   | /api/v1/projects             |
-| GET    | /api/v1/projects/:id         |
-| PUT    | /api/v1/projects/:id         |
-| DELETE | /api/v1/projects/:id         |
-| GET    | /api/v1/projects/mine        |
-| GET    | /api/v1/projects/recommended |
+Neon PostgreSQL
 
-### Applications
+## Redis
 
-| Method | Endpoint                          |
-| ------ | --------------------------------- |
-| POST   | /api/v1/projects/:id/applications |
-| GET    | /api/v1/applications/mine         |
-| GET    | /api/v1/applications/incoming     |
-| PATCH  | /api/v1/applications/:id/status   |
-
-### Notifications
-
-| Method | Endpoint                       |
-| ------ | ------------------------------ |
-| GET    | /api/v1/notifications          |
-| PATCH  | /api/v1/notifications/:id/read |
-| PATCH  | /api/v1/notifications/read-all |
-
-### WebSocket
-
-```
-ws://localhost:8080/ws/projects/{projectId}
-```
+Redis
 
 ---
 
-## Screenshots
+# Дизайн
 
-Add screenshots of:
+Интерфейс приложения разработан в Figma.
 
-* Login
-* Registration
+Макет включает основные страницы приложения:
+
+* Авторизация
+* Регистрация
 * Dashboard
-* Profile
-* Project List
-* Project Details
-* Chat
-* Notifications
+* Проекты
+* Создание проекта
+* Страница проекта
+* Профиль пользователя
+* Поиск пользователей
+* Чат проекта
+
+Ссылка на макет:
+
+https://www.figma.com/design/m1rGt8tQSuBplKZWENYZsi/Untitled?node-id=0-1&p=f&t=4M2vLNqAHiNw7vn3-0
 
 ---
 
-## Author
+# Автор
 
 **Rashid Shinibaev**
 
-GitHub: https://github.com/rash111d
+Учебный проект по дисциплине **Full-Stack Web Development**.
+
+Проект разработан в рамках производственной практики и демонстрирует создание полноценного веб-приложения с использованием современных технологий Frontend и Backend.
