@@ -147,13 +147,16 @@ func (s *Store) FindProjectByID(projectID uint) (*entities.Project, error) {
 }
 
 func (s *Store) List(filters domain.ProjectFilters) ([]entities.Project, int64, error) {
-	query := s.db.Model(&entities.Project{})
-	query = applyProjectFilters(query, filters)
+	baseQuery := s.db.Model(&entities.Project{})
+	baseQuery = applyProjectFilters(baseQuery, filters)
 
 	var total int64
-	if err := query.Distinct("projects.id").Count(&total).Error; err != nil {
+	if err := baseQuery.Distinct("projects.id").Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
+
+	query := s.db.Model(&entities.Project{})
+	query = applyProjectFilters(query, filters)
 
 	var projects []entities.Project
 	err := applyProjectSort(query, filters.Sort).
@@ -163,6 +166,7 @@ func (s *Store) List(filters domain.ProjectFilters) ([]entities.Project, int64, 
 		Limit(limit(filters.Limit)).
 		Offset(offset(filters.Offset)).
 		Find(&projects).Error
+
 	return projects, total, err
 }
 
