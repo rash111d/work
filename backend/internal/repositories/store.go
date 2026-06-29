@@ -56,13 +56,16 @@ func (s *Store) ReplaceUserSkills(user *entities.User, skills []entities.Skill) 
 }
 
 func (s *Store) Search(filters domain.UserFilters) ([]entities.User, int64, error) {
-	query := s.db.Model(&entities.User{})
+	query := s.db.Session(&gorm.Session{}).Model(&entities.User{})
 	query = applyUserFilters(query, filters)
 
 	var total int64
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
+
+	query = s.db.Session(&gorm.Session{}).Model(&entities.User{})
+	query = applyUserFilters(query, filters)
 
 	var users []entities.User
 	err := applyUserSort(query, filters.Sort).
@@ -147,15 +150,15 @@ func (s *Store) FindProjectByID(projectID uint) (*entities.Project, error) {
 }
 
 func (s *Store) List(filters domain.ProjectFilters) ([]entities.Project, int64, error) {
-	baseQuery := s.db.Model(&entities.Project{})
+	baseQuery := s.db.Session(&gorm.Session{}).Model(&entities.Project{})
 	baseQuery = applyProjectFilters(baseQuery, filters)
 
 	var total int64
-	if err := baseQuery.Distinct("projects.id").Count(&total).Error; err != nil {
+	if err := baseQuery.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	query := s.db.Model(&entities.Project{})
+	query := s.db.Session(&gorm.Session{}).Model(&entities.Project{})
 	query = applyProjectFilters(query, filters)
 
 	var projects []entities.Project
@@ -413,11 +416,16 @@ func applyUserFilters(query *gorm.DB, filters domain.UserFilters) *gorm.DB {
 		query = query.Where("rating >= ?", filters.MinRating)
 	}
 	if len(filters.Skills) > 0 {
-		query = query.
-			Joins("JOIN user_skills ON user_skills.user_id = users.id").
-			Joins("JOIN skills ON skills.id = user_skills.skill_id").
-			Where("LOWER(skills.name) IN ?", lowerNames(filters.Skills)).
-			Group("users.id")
+		query = query.Where(
+			`EXISTS (
+				SELECT 1
+				FROM user_skills
+				JOIN skills ON skills.id = user_skills.skill_id
+				WHERE user_skills.user_id = users.id
+				AND LOWER(skills.name) IN ?
+			)`,
+			lowerNames(filters.Skills),
+		)
 	}
 	return query
 }
@@ -431,11 +439,16 @@ func applyProjectFilters(query *gorm.DB, filters domain.ProjectFilters) *gorm.DB
 		query = query.Where("projects.status = ?", filters.Status)
 	}
 	if len(filters.Stack) > 0 {
-		query = query.
-			Joins("JOIN project_skills ON project_skills.project_id = projects.id").
-			Joins("JOIN skills ON skills.id = project_skills.skill_id").
-			Where("LOWER(skills.name) IN ?", lowerNames(filters.Stack)).
-			Group("projects.id")
+		query = query.Where(
+			`EXISTS (
+				SELECT 1
+				FROM project_skills
+				JOIN skills ON skills.id = project_skills.skill_id
+				WHERE project_skills.project_id = projects.id
+				AND LOWER(skills.name) IN ?
+			)`,
+			lowerNames(filters.Stack),
+		)
 	}
 	return query
 }
